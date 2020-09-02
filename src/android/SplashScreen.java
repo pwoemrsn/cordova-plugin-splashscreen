@@ -27,7 +27,10 @@ import android.content.res.Configuration;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -201,6 +204,42 @@ public class SplashScreen extends CordovaPlugin {
         return null;
     }
 
+    public boolean isDevice(DisplayMetrics currentDevice, DisplayMetrics targetDevice, boolean isPortrait) {
+      return currentDevice.densityDpi == targetDevice.densityDpi &&
+        currentDevice.widthPixels == (isPortrait ? targetDevice.widthPixels : targetDevice.heightPixels) &&
+        currentDevice.heightPixels == (isPortrait ? targetDevice.heightPixels : targetDevice.widthPixels);
+    }
+
+    public void adjustScale() {
+      DisplayMetrics SamsungTabS3 = new DisplayMetrics() {{
+        densityDpi = DisplayMetrics.DENSITY_XHIGH;
+        widthPixels = 1536;
+        heightPixels = 2048;
+      }};
+      DisplayMetrics Nexus5 = new DisplayMetrics() {{
+        densityDpi = DisplayMetrics.DENSITY_XXHIGH;
+        widthPixels = 1080;
+        heightPixels = 1920;
+      }};
+      DisplayMetrics metrics = new DisplayMetrics();
+      cordova.getActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+      Configuration config = cordova.getActivity().getResources().getConfiguration();
+
+      if (!isMaintainAspectRatio() ||
+        (config.orientation == Configuration.ORIENTATION_PORTRAIT && metrics.densityDpi == DisplayMetrics.DENSITY_XHIGH) ||
+        (config.orientation == Configuration.ORIENTATION_LANDSCAPE && (metrics.densityDpi == DisplayMetrics.DENSITY_XXHIGH || metrics.densityDpi == DisplayMetrics.DENSITY_XXXHIGH)) ||
+        (config.orientation == Configuration.ORIENTATION_PORTRAIT  && isDevice(metrics, Nexus5, true)) ||
+        (config.orientation == Configuration.ORIENTATION_PORTRAIT  && isDevice(metrics, SamsungTabS3, true))
+      ) {
+          // FIT_XY scales image non-uniformly to fit into image view.
+          splashImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+      }
+      else {
+        // CENTER_CROP scale mode is equivalent to CSS "background-size:cover"
+        splashImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+      }
+    }
+
     // Don't add @Override so that plugin still compiles on 3.x.x for a while
     public void onConfigurationChanged(Configuration newConfig) {
         if (newConfig.orientation != orientation) {
@@ -208,6 +247,7 @@ public class SplashScreen extends CordovaPlugin {
 
             // Splash drawable may change with orientation, so reload it.
             if (splashImageView != null) {
+                adjustScale();
                 int drawableId = getSplashId();
                 if (drawableId != 0) {
                     splashImageView.setImageDrawable(cordova.getActivity().getResources().getDrawable(drawableId));
@@ -219,7 +259,7 @@ public class SplashScreen extends CordovaPlugin {
     private void removeSplashScreen(final boolean forceHideImmediately) {
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
-        if (splashDialog != null && splashImageView != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
+                if (splashDialog != null && splashDialog.isShowing()) {
                     final int fadeSplashScreenDuration = getFadeDuration();
                     // CB-10692 If the plugin is being paused/destroyed, skip the fading and hide it immediately
                     if (fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
@@ -238,7 +278,7 @@ public class SplashScreen extends CordovaPlugin {
 
                             @Override
                             public void onAnimationEnd(Animation animation) {
-                                if (splashDialog != null && splashImageView != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
+                                if (splashDialog != null && splashDialog.isShowing()) {
                                     splashDialog.dismiss();
                                     splashDialog = null;
                                     splashImageView = null;
@@ -303,14 +343,7 @@ public class SplashScreen extends CordovaPlugin {
                 // TODO: Use the background color of the webView's parent instead of using the preference.
                 splashImageView.setBackgroundColor(preferences.getInteger("backgroundColor", Color.BLACK));
 
-                if (isMaintainAspectRatio()) {
-                    // CENTER_CROP scale mode is equivalent to CSS "background-size:cover"
-                    splashImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }
-                else {
-                    // FIT_XY scales image non-uniformly to fit into image view.
-                    splashImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                }
+                adjustScale();
 
                 // Create and show the dialog
                 splashDialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
