@@ -74,7 +74,10 @@ This plugin displays and hides a splash screen while your web application is lau
 ## Supported Platforms
 
 - Android
-- iOS
+- iOS  
+  __Note__: iOS implementation has been moved to the core framework.  
+    If using `cordova-ios@5` or earlier, use `cordova-plugin-splashscreen@5`  
+    If using `cordova-ios@6` or later, use `cordova-plugin-splashscreen@6`. If developing exclusively for the iOS platform, this plugin can be uninstalled.
 - Windows (`cordova-windows` version >= 4.4.0 is required)  
   __Note__: Extended splashscreen does not require the plugin on Windows (as opposed to Android and iOS) in case you don't use the plugin API, i.e. programmatic hide/show.
 - Browser
@@ -190,6 +193,19 @@ For more examples, please see [the Example Configuration](#example-android-confi
 
 ```xml
 <platform name="android">
+    <!-- Default 
+    Note: You should specify default resources for each density.
+      -- For instance, if the device(hdpi) is in landscape orientation and [density="land-hdpi"] 
+      -- does not exists, [density="hdpi"] will be selected 
+      If you do not declare this you will get MissingDefaultResource lint check errors.
+      -->
+    <splash src="res/screen/android/splash-port-hdpi.png" density="hdpi"/>
+    <splash src="res/screen/android/splash-port-ldpi.png" density="ldpi"/>
+    <splash src="res/screen/android/splash-port-mdpi.png" density="mdpi"/>
+    <splash src="res/screen/android/splash-port-xhdpi.png" density="xhdpi"/>
+    <splash src="res/screen/android/splash-port-xxhdpi.png" density="xxhdpi"/>
+
+    <!-- Landscape -->
     <splash src="res/screen/android/splash-land-hdpi.png" density="land-hdpi" />
     <splash src="res/screen/android/splash-land-ldpi.png" density="land-ldpi" />
     <splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi" />
@@ -197,6 +213,7 @@ For more examples, please see [the Example Configuration](#example-android-confi
     <splash src="res/screen/android/splash-land-xxhdpi.png" density="land-xxhdpi" />
     <splash src="res/screen/android/splash-land-xxxhdpi.png" density="land-xxxhdpi" />
 
+    <!-- Portrait -->
     <splash src="res/screen/android/splash-port-hdpi.png" density="port-hdpi" />
     <splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi" />
     <splash src="res/screen/android/splash-port-mdpi.png" density="port-mdpi" />
@@ -205,19 +222,19 @@ For more examples, please see [the Example Configuration](#example-android-confi
     <splash src="res/screen/android/splash-port-xxxhdpi.png" density="port-xxxhdpi" />
   
     <!-- Dark Mode -->
-    <splash src="res/screen/android/splash-land-hdpi.png" density="land-night-hdpi" />
-    <splash src="res/screen/android/splash-land-ldpi.png" density="land-night-ldpi" />
-    <splash src="res/screen/android/splash-land-mdpi.png" density="land-night-mdpi" />
-    <splash src="res/screen/android/splash-land-xhdpi.png" density="land-night-xhdpi" />
-    <splash src="res/screen/android/splash-land-xxhdpi.png" density="land-night-xxhdpi" />
-    <splash src="res/screen/android/splash-land-xxxhdpi.png" density="land-night-xxxhdpi" />
+    <splash src="res/screen/android/splash-land-night-hdpi.png" density="land-night-hdpi" />
+    <splash src="res/screen/android/splash-land-night-ldpi.png" density="land-night-ldpi" />
+    <splash src="res/screen/android/splash-land-night-mdpi.png" density="land-night-mdpi" />
+    <splash src="res/screen/android/splash-land-night-xhdpi.png" density="land-night-xhdpi" />
+    <splash src="res/screen/android/splash-land-night-xxhdpi.png" density="land-night-xxhdpi" />
+    <splash src="res/screen/android/splash-land-night-xxxhdpi.png" density="land-night-xxxhdpi" />
 
-    <splash src="res/screen/android/splash-port-hdpi.png" density="port-night-hdpi" />
-    <splash src="res/screen/android/splash-port-ldpi.png" density="port-night-ldpi" />
-    <splash src="res/screen/android/splash-port-mdpi.png" density="port-night-mdpi" />
-    <splash src="res/screen/android/splash-port-xhdpi.png" density="port-night-xhdpi" />
-    <splash src="res/screen/android/splash-port-xxhdpi.png" density="port-night-xxhdpi" />
-    <splash src="res/screen/android/splash-port-xxxhdpi.png" density="port-night-xxxhdpi" />
+    <splash src="res/screen/android/splash-port-night-hdpi.png" density="port-night-hdpi" />
+    <splash src="res/screen/android/splash-port-night-ldpi.png" density="port-night-ldpi" />
+    <splash src="res/screen/android/splash-port-night-mdpi.png" density="port-night-mdpi" />
+    <splash src="res/screen/android/splash-port-night-xhdpi.png" density="port-night-xhdpi" />
+    <splash src="res/screen/android/splash-port-night-xxhdpi.png" density="port-night-xxhdpi" />
+    <splash src="res/screen/android/splash-port-night-xxxhdpi.png" density="port-night-xxxhdpi" />
 </platform>
 ```
 
